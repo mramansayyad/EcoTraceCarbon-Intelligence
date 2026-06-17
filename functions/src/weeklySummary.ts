@@ -15,7 +15,6 @@ export const weeklySummary = onMessagePublished('weekly-summary', async (event) 
     const batch = db.batch();
 
     for (const userDoc of usersSnap.docs) {
-      const userData = userDoc.data();
       const uid = userDoc.id;
       
       // Calculate last 7 days of emissions

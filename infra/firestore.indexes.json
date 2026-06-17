@@ -24,13 +24,6 @@
         { "fieldPath": "uid", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "weekly_kg_co2e", "order": "ASCENDING" }
-      ]
     }
   ],
   "fieldOverrides": []

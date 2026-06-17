@@ -35,6 +35,23 @@ app.use(loggerMiddleware);
 app.use(rateLimiter);
 
 // Bind Routers
+app.get('/', (req: any, res: any) => {
+  res.json({
+    name: 'EcoTrace Carbon Intelligence API',
+    version: '1.0.0',
+    status: 'online',
+    documentation: 'https://github.com/mramansayyad/EcoTraceCarbon-Intelligence',
+    endpoints: {
+      health: '/health',
+      activities: '/activities',
+      dashboard: '/dashboard',
+      ai: '/ai',
+      goals: '/goals',
+      community: '/community',
+      export: '/export'
+    }
+  });
+});
 app.use('/health', healthRouter);
 app.use('/activities', activitiesRouter);
 app.use('/dashboard', dashboardRouter);
