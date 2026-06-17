@@ -1,0 +1,73 @@
+name: Deploy EcoTrace Platform
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: backend/package.json
+      - name: Install Dependencies
+        run: npm --prefix backend ci
+      - name: Run Unit Tests
+        run: npm --prefix backend run test
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package.json
+      - name: Install Dependencies
+        run: npm --prefix frontend ci
+      - name: Build Next.js
+        run: npm --prefix frontend run build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8080
+
+  deploy:
+    needs: [test-backend, test-frontend]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: |
+          gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+
+      - name: Build and Push Backend Image
+        run: |
+          docker build -t asia-south1-docker.pkg.dev/virtual-promptwars-492614/ecotrace/backend:latest ./backend
+          docker push asia-south1-docker.pkg.dev/virtual-promptwars-492614/ecotrace/backend:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ecotrace-api \
+            --image=asia-south1-docker.pkg.dev/virtual-promptwars-492614/ecotrace/backend:latest \
+            --region=asia-south1 \
+            --platform=managed \
+            --allow-unauthenticated
+
