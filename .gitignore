@@ -1,0 +1,58 @@
+# Dependency folders
+node_modules/
+**/node_modules/
+
+# Compilation outputs
+dist/
+**/dist/
+build/
+**/build/
+.next/
+**/next/
+out/
+.tsbuildinfo
+**/*.tsbuildinfo
+functions/lib/
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+service-account*.json
+firebase-adminsdk*.json
+github-actions-deployer-key.json
+
+# Local Java SDK
+.jdk21/
+
+# Test outputs
+coverage/
+.nyc_output/
+stryker-tmp/
+reports/
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pino.log
+firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
+
+# Artillery temp
+.artillery/
+
+# Stryker
+.stryker-tmp/

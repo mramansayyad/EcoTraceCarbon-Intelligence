@@ -1,0 +1,66 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": { "project": "./tsconfig.json" },
+  "plugins": [
+    "@typescript-eslint",
+    "import",
+    "jsdoc",
+    "unicorn",
+    "sonarjs",
+    "security"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/strict-type-checked",
+    "plugin:@typescript-eslint/stylistic-type-checked",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "plugin:jsdoc/recommended-typescript",
+    "plugin:sonarjs/recommended",
+    "plugin:security/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-non-null-assertion": "error",
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "@typescript-eslint/explicit-module-boundary-types": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/await-thenable": "error",
+    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/prefer-readonly": "error",
+    "@typescript-eslint/prefer-readonly-parameter-types": "warn",
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/consistent-type-imports": ["error", {"prefer": "type-imports"}],
+    "complexity": ["error", 10],
+    "max-lines": ["error", {"max": 300, "skipComments": true}],
+    "max-lines-per-function": ["error", {"max": 30, "skipBlankLines": true}],
+    "max-depth": ["error", 4],
+    "max-params": ["error", 4],
+    "no-console": "error",
+    "import/order": ["error", {
+      "groups": ["builtin","external","internal","parent","sibling","index"],
+      "newlines-between": "always",
+      "alphabetize": { "order": "asc" }
+    }],
+    "import/no-default-export": "warn",
+    "jsdoc/require-jsdoc": ["error", {
+      "require": {
+        "FunctionDeclaration": true,
+        "MethodDefinition": true,
+        "ClassDeclaration": true,
+        "ArrowFunctionExpression": false
+      }
+    }],
+    "jsdoc/require-param": "error",
+    "jsdoc/require-returns": "error",
+    "jsdoc/require-throws": "error",
+    "sonarjs/cognitive-complexity": ["error", 15],
+    "sonarjs/no-duplicate-string": ["error", 5],
+    "sonarjs/no-identical-functions": "error",
+    "unicorn/prefer-module": "error",
+    "unicorn/no-array-for-each": "error",
+    "unicorn/prefer-ternary": "error",
+    "unicorn/no-null": "warn"
+  }
+}

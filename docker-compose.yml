@@ -1,0 +1,45 @@
+services:
+  # Firebase Emulator Suite for local auth, database, and pubsub replication
+  firebase-emulator:
+    image: andreysenov/firebase-tools:latest
+    ports:
+      - "4000:4000" # Emulator UI
+      - "8090:8090" # Firestore Emulator
+      - "9099:9099" # Auth Emulator
+      - "8085:8085" # Pub/Sub Emulator
+    environment:
+      - FIREBASE_TOKEN=mock_token
+    volumes:
+      - ./infra/emulator-data:/home/node/data
+    command: firebase emulators:start --project virtual-promptwars-492614 --import=/home/node/data --export-on-exit=/home/node/data
+
+  # Express Backend Container
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - NODE_ENV=development
+      - FIREBASE_AUTH_EMULATOR_HOST=firebase-emulator:9099
+      - FIRESTORE_EMULATOR_HOST=firebase-emulator:8090
+      - PUBSUB_EMULATOR_HOST=firebase-emulator:8085
+      - GCP_PROJECT_ID=virtual-promptwars-492614
+      - DEV_BYPASS_SECRETS=true
+    depends_on:
+      - firebase-emulator
+
+  # Next.js Frontend Development Server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_FIREBASE_EMULATOR=true
+    depends_on:
+      - backend
