@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only read/write their own profile
+    match /users/{userId} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
+    }
+    // Activities: owner only, validate schema on write
+    match /activities/{activityId} {
+      allow read: if request.auth != null
+                  && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.keys().hasAll(
+                         ['uid','category','subcategory','kg_co2e','timestamp'])
+                    && request.resource.data.kg_co2e is number
+                    && request.resource.data.kg_co2e >= 0
+                    && request.resource.data.kg_co2e <= 10000;
+      allow update, delete: if request.auth != null
+                             && resource.data.uid == request.auth.uid;
+    }
+    // Goals: owner only
+    match /goals/{goalId} {
+      allow read, write: if request.auth != null
+                         && (resource == null || resource.data.uid == request.auth.uid);
+    }
+    // Community stats: read-only, aggregated only
+    match /community_stats/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only Admin/Backend writes this
+    }
+    // Emission factors: read-only for authenticated users
+    match /emission_factors/{factorId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only Admin/Backend writes this
+    }
+  }
+}
