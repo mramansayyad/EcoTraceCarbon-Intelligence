@@ -11,6 +11,7 @@ router.get('/', authMiddleware, async (req: AuthenticatedRequest, res: Response,
     return res.json(dashboardData);
   } catch (err) {
     next(err);
+    return;
   }
 });
 

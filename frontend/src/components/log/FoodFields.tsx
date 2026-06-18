@@ -1,11 +1,12 @@
 import React from 'react';
 import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { LogActivityInput } from '../../lib/validators';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 
 interface FoodFieldsProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
+  register: UseFormRegister<LogActivityInput>;
+  errors: FieldErrors<LogActivityInput>;
 }
 
 export const FoodFields: React.FC<FoodFieldsProps> = ({ register, errors }) => {

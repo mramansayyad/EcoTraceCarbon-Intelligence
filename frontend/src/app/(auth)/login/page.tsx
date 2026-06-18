@@ -9,12 +9,15 @@ import { auth, db } from '../../../lib/firebase';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { LoginSchema } from '../../../lib/validators';
-import { useAuthStore } from '../../../store/authStore';
+import { useAuthStore, UserProfileData } from '../../../store/authStore';
 import { useUIStore } from '../../../store/uiStore';
 import { Card, CardHeader, CardBody } from '../../../components/ui/Card';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { Leaf, LogIn } from 'lucide-react';
+import { z } from 'zod';
+
+type LoginInput = z.infer<typeof LoginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,12 +25,12 @@ export default function LoginPage() {
   const { addToast } = useUIStore();
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginInput>({
     resolver: zodResolver(LoginSchema),
     defaultValues: { email: '', password: '' }
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginInput) => {
     setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
@@ -35,18 +38,19 @@ export default function LoginPage() {
       // Fetch user profile from Firestore
       const userDocRef = doc(db, 'users', userCredential.user.uid);
       const userSnap = await getDoc(userDocRef);
-      const profile = userSnap.exists() ? userSnap.data() : null;
+      const profile = userSnap.exists() ? (userSnap.data() as UserProfileData) : null;
 
       // Update local state
-      setAuth(userCredential.user, profile as any);
+      setAuth(userCredential.user, profile);
       addToast('Welcome back to EcoTrace!', 'success');
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Firebase Auth Login Error:', err);
       let friendlyMessage = 'Invalid credentials. Please try again.';
       
-      const errorCode = err.code || '';
-      const errorMessage = err.message || '';
+      const error = err as { code?: string; message?: string };
+      const errorCode = error.code || '';
+      const errorMessage = error.message || '';
       
       if (errorCode === 'auth/user-not-found' || errorMessage.includes('auth/user-not-found')) {
         friendlyMessage = 'User account not found. Click "Create an account" below to register.';
@@ -74,14 +78,15 @@ export default function LoginPage() {
       
       const userDocRef = doc(db, 'users', userCredential.user.uid);
       const userSnap = await getDoc(userDocRef);
-      const profile = userSnap.exists() ? userSnap.data() : null;
+      const profile = userSnap.exists() ? (userSnap.data() as UserProfileData) : null;
 
-      setAuth(userCredential.user, profile as any);
+      setAuth(userCredential.user, profile);
       addToast('Successfully signed in with Google!', 'success');
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Google Sign-in Error:', err);
-      addToast(err.message || 'Google Sign-in failed.', 'error');
+      const error = err as { message?: string };
+      addToast(error.message || 'Google Sign-in failed.', 'error');
     } finally {
       setLoading(false);
     }

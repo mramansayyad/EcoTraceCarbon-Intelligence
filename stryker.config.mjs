@@ -17,6 +17,6 @@ export default {
   },
   jest: {
     projectType: 'custom',
-    configFile: 'backend/jest.config.ts',
+    configFile: 'backend/jest.config.js',
   },
 };

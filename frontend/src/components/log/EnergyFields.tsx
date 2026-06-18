@@ -1,12 +1,13 @@
 import React from 'react';
 import { UseFormRegister, FieldErrors, UseFormWatch } from 'react-hook-form';
+import { LogActivityInput } from '../../lib/validators';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 
 interface EnergyFieldsProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
-  watch: UseFormWatch<any>;
+  register: UseFormRegister<LogActivityInput>;
+  errors: FieldErrors<LogActivityInput>;
+  watch: UseFormWatch<LogActivityInput>;
 }
 
 export const EnergyFields: React.FC<EnergyFieldsProps> = ({ register, errors, watch }) => {
@@ -48,7 +49,7 @@ export const EnergyFields: React.FC<EnergyFieldsProps> = ({ register, errors, wa
         <Input
           label="State/Region"
           type="text"
-          error={(errors.details as any)?.location?.message as string}
+          error={errors.details?.location?.message as string}
           placeholder="e.g. India"
           {...register('details.location')}
         />

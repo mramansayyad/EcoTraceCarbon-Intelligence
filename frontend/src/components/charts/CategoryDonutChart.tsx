@@ -70,7 +70,12 @@ export const CategoryDonutChart: React.FC<CategoryDonutChartProps> = ({ data }) 
               borderRadius: '8px'
             }}
             itemStyle={{ fontSize: '12px' }}
-            formatter={(val: any) => [`${Number(val).toFixed(1)} kg CO2e`]}
+            formatter={(val: string | number | readonly (string | number)[] | undefined) => {
+              if (typeof val === 'number' || typeof val === 'string') {
+                return [`${Number(val).toFixed(1)} kg CO2e`];
+              }
+              return ['0.0 kg CO2e'];
+            }}
           />
           <Legend 
             layout="horizontal" 

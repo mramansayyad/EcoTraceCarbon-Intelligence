@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { GoalCreateSchema } from '../../../lib/validators';
 import { useGoals } from '../../../hooks/useGoals';
@@ -10,9 +10,25 @@ import { Card, CardBody, CardHeader } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { Select } from '../../../components/ui/Select';
-import { Target, Calendar, Award, Trash2, ArrowLeft, Loader2, BarChart2 } from 'lucide-react';
+import { Target, Calendar, ArrowLeft, Loader2, BarChart2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Badge } from '../../../components/ui/Badge';
+import { z } from 'zod';
+
+type GoalCreateInput = z.infer<typeof GoalCreateSchema>;
+
+interface Goal {
+  id?: string;
+  uid: string;
+  category: 'transport' | 'food' | 'energy' | 'shopping' | 'all';
+  targetReductionPct: number;
+  durationWeeks: number;
+  baselineWeekly: number;
+  targetWeekly: number;
+  status: 'active' | 'completed' | 'failed';
+  createdAt: string;
+  endDate: string;
+}
 
 export default function GoalsPage() {
   const router = useRouter();
@@ -24,8 +40,8 @@ export default function GoalsPage() {
     handleSubmit,
     reset,
     formState: { errors }
-  } = useForm({
-    resolver: zodResolver(GoalCreateSchema),
+  } = useForm<GoalCreateInput>({
+    resolver: zodResolver(GoalCreateSchema) as unknown as Resolver<GoalCreateInput>,
     defaultValues: {
       category: 'all',
       targetReductionPct: 10,
@@ -35,10 +51,17 @@ export default function GoalsPage() {
 
   // Automatically select the first active goal on load
   useEffect(() => {
+    let timer: NodeJS.Timeout;
     if (goals.length > 0 && !selectedGoalId) {
-      const activeGoal = goals.find((g: any) => g.status === 'active') || goals[0];
-      setSelectedGoalId(activeGoal.id);
+      const activeGoal = (goals as Goal[]).find((g) => g.status === 'active') || (goals[0] as Goal);
+      if (activeGoal?.id) {
+        const id = activeGoal.id;
+        timer = setTimeout(() => setSelectedGoalId(id), 0);
+      }
     }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [goals, selectedGoalId]);
 
   // Fetch progress for selected goal
@@ -46,14 +69,14 @@ export default function GoalsPage() {
   const progressData = progressQuery.data || [];
   const isProgressLoading = progressQuery.isLoading;
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: GoalCreateInput) => {
     try {
-      const newGoal = await createGoal(data);
+      const newGoal = await createGoal(data) as Goal;
       if (newGoal && newGoal.id) {
         setSelectedGoalId(newGoal.id);
       }
       reset();
-    } catch (e) {
+    } catch {
       // toast shown in hook
     }
   };
@@ -112,14 +135,14 @@ export default function GoalsPage() {
                     { value: 'energy', label: '⚡ Home Energy only' },
                     { value: 'shopping', label: '🛒 Shopping only' }
                   ]}
-                  error={errors.category?.message as string}
+                  error={errors.category?.message}
                   {...register('category')}
                 />
 
                 <Input
                   label="Target Reduction Percentage (%)"
                   type="number"
-                  error={errors.targetReductionPct?.message as string}
+                  error={errors.targetReductionPct?.message}
                   placeholder="e.g. 15"
                   {...register('targetReductionPct')}
                 />
@@ -131,7 +154,7 @@ export default function GoalsPage() {
                     { value: '8', label: '8 Weeks' },
                     { value: '12', label: '12 Weeks' }
                   ]}
-                  error={errors.durationWeeks?.message as string}
+                  error={errors.durationWeeks?.message}
                   {...register('durationWeeks')}
                 />
 
@@ -165,10 +188,10 @@ export default function GoalsPage() {
                   No goals set yet. Set your first goal above.
                 </div>
               ) : (
-                goals.map((g: any) => (
+                (goals as Goal[]).map((g) => (
                   <button
                     key={g.id}
-                    onClick={() => setSelectedGoalId(g.id)}
+                    onClick={() => setSelectedGoalId(g.id || '')}
                     className={`w-full text-left p-3 rounded-xl border transition-all flex items-center justify-between group cursor-pointer ${
                       selectedGoalId === g.id
                         ? 'border-accent-green bg-accent-green/5'
@@ -229,13 +252,13 @@ export default function GoalsPage() {
                       <div className="p-3 bg-zinc-900/60 border border-zinc-850 rounded-xl text-center">
                         <span className="text-[10px] font-bold text-zinc-500 uppercase">Baseline</span>
                         <div className="text-lg font-bold text-white mt-1">
-                          {goals.find((g: any) => g.id === selectedGoalId)?.baselineWeekly.toFixed(1)} kg
+                          {(goals as Goal[]).find((g) => g.id === selectedGoalId)?.baselineWeekly.toFixed(1)} kg
                         </div>
                       </div>
                       <div className="p-3 bg-zinc-900/60 border border-zinc-850 rounded-xl text-center">
                         <span className="text-[10px] font-bold text-zinc-500 uppercase">Target Limit</span>
                         <div className="text-lg font-bold text-emerald-400 mt-1">
-                          {goals.find((g: any) => g.id === selectedGoalId)?.targetWeekly.toFixed(1)} kg
+                          {(goals as Goal[]).find((g) => g.id === selectedGoalId)?.targetWeekly.toFixed(1)} kg
                         </div>
                       </div>
                       <div className="p-3 bg-zinc-900/60 border border-zinc-850 rounded-xl text-center">

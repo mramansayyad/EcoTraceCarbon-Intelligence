@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Award, Shield } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import { Card, CardBody } from '../ui/Card';
 
 interface CarbonStreakBadgeProps {

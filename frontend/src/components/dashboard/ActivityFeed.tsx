@@ -1,13 +1,4 @@
 import React from 'react';
-interface Activity {
-  id: string;
-  category: 'transport' | 'food' | 'energy' | 'shopping';
-  subcategory: string;
-  value: number;
-  kg_co2e: number;
-  details: any;
-  timestamp: string;
-}
 import { formatCO2e, formatDate } from '../../lib/formatters';
 import { 
   Car, 
@@ -19,10 +10,19 @@ import {
   Train,
   Flame
 } from 'lucide-react';
-import { Button } from '../ui/Button';
+
+export interface Activity {
+  id: string;
+  category: 'transport' | 'food' | 'energy' | 'shopping';
+  subcategory: string;
+  value: number;
+  kg_co2e: number;
+  details: Record<string, unknown>;
+  timestamp: string;
+}
 
 interface ActivityFeedProps {
-  activities: any[];
+  activities: Activity[];
   onDelete?: (id: string) => void;
   isDeleting?: boolean;
 }

@@ -29,5 +29,5 @@ export function getDaysAgo(days: number): Date {
 }
 
 export function toISODateString(date: Date): string {
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split('T')[0] || '';
 }

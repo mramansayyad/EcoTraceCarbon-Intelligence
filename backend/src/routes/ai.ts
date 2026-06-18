@@ -46,12 +46,10 @@ router.get('/insights', authMiddleware, async (req: AuthenticatedRequest, res: R
     // Otherwise, collect context from dashboardService and request new insight from Gemini
     const dashboard = await getDashboardData(uid);
     const totalWeekEmissions = dashboard.stats.week.value;
-    const topCategory = dashboard.charts.categories.length > 0 
-      ? (dashboard.charts.categories.sort((a,b) => b.value - a.value)[0].category as any)
-      : 'transport';
-    
-    const topCategoryItem = dashboard.charts.categories.find(c => c.category === topCategory);
-    const topCategoryKg = topCategoryItem ? topCategoryItem.value : 0;
+    const sortedCategories = [...dashboard.charts.categories].sort((a, b) => b.value - a.value);
+    const firstCategory = sortedCategories[0];
+    const topCategory = firstCategory ? (firstCategory.category as 'transport' | 'food' | 'energy' | 'shopping') : 'transport';
+    const topCategoryKg = firstCategory ? firstCategory.value : 0;
     
     // Fetch active goals
     const goalsSnapshot = await db.collection('goals')
@@ -82,6 +80,7 @@ router.get('/insights', authMiddleware, async (req: AuthenticatedRequest, res: R
     return res.json({ insight });
   } catch (err) {
     next(err);
+    return;
   }
 });
 

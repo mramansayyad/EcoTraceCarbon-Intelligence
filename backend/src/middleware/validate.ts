@@ -14,6 +14,7 @@ export function validate(schema: AnyZodObject) {
       req.query = parsed.query || req.query;
       req.params = parsed.params || req.params;
       next();
+      return;
     } catch (err) {
       if (err instanceof ZodError) {
         return res.status(400).json({
@@ -25,6 +26,7 @@ export function validate(schema: AnyZodObject) {
         });
       }
       next(err);
+      return;
     }
   };
 }

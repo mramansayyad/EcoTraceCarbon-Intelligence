@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import api from '../lib/api';
 import { useUIStore } from '../store/uiStore';
+import { LogActivityInput } from '../lib/validators';
 
 export function useActivities() {
   const queryClient = useQueryClient();
@@ -15,7 +17,7 @@ export function useActivities() {
   });
 
   const logActivityMutation = useMutation({
-    mutationFn: async (activityData: any) => {
+    mutationFn: async (activityData: LogActivityInput) => {
       const res = await api.post('/activities', activityData);
       return res.data;
     },
@@ -24,7 +26,7 @@ export function useActivities() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       addToast('Carbon activity logged successfully!', 'success');
     },
-    onError: (err: any) => {
+    onError: (err: AxiosError<{ error?: string }>) => {
       const errMsg = err.response?.data?.error || 'Failed to log activity';
       addToast(errMsg, 'error');
     }
@@ -40,14 +42,14 @@ export function useActivities() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       addToast('Activity log deleted.', 'info');
     },
-    onError: (err: any) => {
+    onError: (err: AxiosError<{ error?: string }>) => {
       const errMsg = err.response?.data?.error || 'Failed to delete activity';
       addToast(errMsg, 'error');
     }
   });
 
   return {
-    activities: activitiesQuery.data || [],
+    activities: (activitiesQuery.data as unknown[]) || [],
     isLoading: activitiesQuery.isLoading,
     error: activitiesQuery.error,
     logActivity: logActivityMutation.mutateAsync,

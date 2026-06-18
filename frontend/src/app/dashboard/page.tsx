@@ -14,7 +14,7 @@ import { FootprintTrendChart } from '../../components/charts/FootprintTrendChart
 import { CategoryDonutChart } from '../../components/charts/CategoryDonutChart';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { Card, CardHeader, CardBody } from '../../components/ui/Card';
-import { Leaf, RefreshCw, Zap, Flame, Users, Calendar } from 'lucide-react';
+import { Leaf, RefreshCw, Users, Calendar } from 'lucide-react';
 
 export default function DashboardPage() {
   const { dashboardData, isLoading, error, refetch } = useDashboard();

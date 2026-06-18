@@ -1,4 +1,4 @@
-import { sanitizeGeminiOutput, generateWeeklyInsights } from '../../src/services/geminiService';
+import { sanitizeGeminiOutput } from '../../src/services/geminiService';
 
 describe('geminiService PII scrubbing', () => {
   it('redacts email addresses successfully', () => {

@@ -3,7 +3,6 @@ import {
   calcFlightEmission,
   calcFoodEmission,
   calcElectricityEmission,
-  calcShoppingEmission,
   ValidationError
 } from '../../src/services/emissionService';
 

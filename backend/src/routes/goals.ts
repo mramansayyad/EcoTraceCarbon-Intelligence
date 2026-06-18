@@ -24,6 +24,7 @@ router.post('/', authMiddleware, validate(CreateGoalSchema), async (req: Authent
     return res.status(201).json(goal);
   } catch (err) {
     next(err);
+    return;
   }
 });
 
@@ -35,6 +36,7 @@ router.get('/', authMiddleware, async (req: AuthenticatedRequest, res: Response,
     return res.json(goals);
   } catch (err) {
     next(err);
+    return;
   }
 });
 
@@ -42,10 +44,15 @@ router.get('/', authMiddleware, async (req: AuthenticatedRequest, res: Response,
 router.get('/:id/progress', authMiddleware, async (req: AuthenticatedRequest, res: Response, next) => {
   try {
     const uid = req.user!.uid;
-    const progress = await getGoalProgress(req.params.id, uid);
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ error: 'Goal ID is required' });
+    }
+    const progress = await getGoalProgress(id, uid);
     return res.json(progress);
   } catch (err) {
     next(err);
+    return;
   }
 });
 

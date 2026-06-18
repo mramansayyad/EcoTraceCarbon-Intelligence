@@ -71,22 +71,30 @@ export function calcShoppingEmission(type: string, count: number): number {
   return count * factor;
 }
 
+export interface EmissionDetails {
+  vehicleType?: string;
+  cabinClass?: string;
+  passengers?: number;
+  location?: string;
+  [key: string]: unknown;
+}
+
 export function estimateEmissions(
   category: 'transport' | 'food' | 'energy' | 'shopping',
   subcategory: string,
   value: number,
-  details: any
+  details?: EmissionDetails
 ): number {
   if (value < 0) return 0;
   
   switch (category) {
     case 'transport': {
       if (subcategory === 'car_petrol' || subcategory === 'car_diesel' || subcategory === 'car_ev' || subcategory === 'car') {
-        const fuel = details.vehicleType || subcategory.replace('car_', '');
+        const fuel = details?.vehicleType || subcategory.replace('car_', '');
         return calcCarEmission(value, fuel);
       }
       if (subcategory.startsWith('flight')) {
-        return calcFlightEmission(value, details.cabinClass || 'economy');
+        return calcFlightEmission(value, details?.cabinClass || 'economy');
       }
       const key = subcategory as keyof typeof CLIENT_FACTORS;
       const factor = CLIENT_FACTORS[key] || 0;

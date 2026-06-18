@@ -1,3 +1,4 @@
+import type { User } from 'firebase/auth';
 import { create } from 'zustand';
 
 export interface UserProfileData {
@@ -13,11 +14,11 @@ export interface UserProfileData {
 }
 
 interface AuthState {
-  user: any | null; // Firebase User
+  user: User | null; // Firebase User
   profile: UserProfileData | null; // Custom Profile
   isAuthenticated: boolean;
   isLoading: boolean;
-  setAuth: (user: any | null, profile: UserProfileData | null) => void;
+  setAuth: (user: User | null, profile: UserProfileData | null) => void;
   updateProfile: (profile: Partial<UserProfileData>) => void;
   clearAuth: () => void;
   setLoading: (isLoading: boolean) => void;

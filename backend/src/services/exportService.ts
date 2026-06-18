@@ -3,8 +3,6 @@ import { stringify } from 'csv-stringify/sync';
 import PDFDocument from 'pdfkit';
 import { Activity } from '../models/Activity';
 import { getDashboardData } from './dashboardService';
-import { generateWeeklyInsights } from './geminiService';
-import { getDaysAgo } from '../utils/dateHelpers';
 
 export async function generateCSVString(uid: string): Promise<string> {
   const activitiesSnapshot = await db.collection('activities')
@@ -91,7 +89,7 @@ export async function generatePDFReportStream(uid: string): Promise<PDFKit.PDFDo
       doc.addPage();
       y = 50;
     }
-    const dateStr = act.timestamp.split('T')[0];
+    const dateStr = act.timestamp.split('T')[0] || '';
     doc.text(dateStr, 50, y);
     doc.text(act.category, 150, y);
     doc.text(act.subcategory, 250, y);

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardBody } from '../ui/Card';
-import { Sparkles, ArrowRight, BrainCircuit, RefreshCw } from 'lucide-react';
+import { Sparkles, BrainCircuit, RefreshCw } from 'lucide-react';
 import { useInsights } from '../../hooks/useInsights';
 import { Skeleton } from '../ui/Skeleton';
 

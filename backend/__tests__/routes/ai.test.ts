@@ -1,6 +1,5 @@
 import request from 'supertest';
 import { app } from '../../src/app.js';
-import { db } from '../../src/config/firebase-admin';
 
 // Mock Firebase Admin
 const mockUpdate = jest.fn();

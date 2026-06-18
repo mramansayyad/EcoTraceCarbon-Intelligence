@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import ActivityForm from '../../../components/log/ActivityForm';
-import { Card, CardBody, CardHeader } from '../../../components/ui/Card';
+import { Card, CardBody } from '../../../components/ui/Card';
 import { ArrowLeft } from 'lucide-react';
 
 export default function LogActivityPage() {

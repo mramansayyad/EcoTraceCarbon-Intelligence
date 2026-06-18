@@ -1,12 +1,13 @@
 import React from 'react';
 import { UseFormRegister, FieldErrors, UseFormWatch } from 'react-hook-form';
+import { LogActivityInput } from '../../lib/validators';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 
 interface TransportFieldsProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
-  watch: UseFormWatch<any>;
+  register: UseFormRegister<LogActivityInput>;
+  errors: FieldErrors<LogActivityInput>;
+  watch: UseFormWatch<LogActivityInput>;
 }
 
 export const TransportFields: React.FC<TransportFieldsProps> = ({ register, errors, watch }) => {
@@ -56,7 +57,7 @@ export const TransportFields: React.FC<TransportFieldsProps> = ({ register, erro
         <Select
           label="Fuel/Engine Type"
           options={vehicleTypeOptions}
-          error={(errors.details as any)?.vehicleType?.message as string}
+          error={errors.details?.vehicleType?.message as string}
           {...register('details.vehicleType')}
         />
       )}
@@ -65,7 +66,7 @@ export const TransportFields: React.FC<TransportFieldsProps> = ({ register, erro
         <Select
           label="Cabin Seating Class"
           options={cabinClassOptions}
-          error={(errors.details as any)?.cabinClass?.message as string}
+          error={errors.details?.cabinClass?.message as string}
           {...register('details.cabinClass')}
         />
       )}
@@ -74,7 +75,7 @@ export const TransportFields: React.FC<TransportFieldsProps> = ({ register, erro
         <Input
           label="Number of Passengers"
           type="number"
-          error={(errors.details as any)?.passengers?.message as string}
+          error={errors.details?.passengers?.message as string}
           placeholder="1"
           {...register('details.passengers')}
         />

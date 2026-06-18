@@ -29,6 +29,7 @@ router.post('/', authMiddleware, validate(CreateActivitySchema), async (req: Aut
     return res.status(201).json(activity);
   } catch (err) {
     next(err);
+    return;
   }
 });
 
@@ -43,6 +44,7 @@ router.get('/', authMiddleware, async (req: AuthenticatedRequest, res: Response,
     return res.json(activities);
   } catch (err) {
     next(err);
+    return;
   }
 });
 
@@ -50,7 +52,11 @@ router.get('/', authMiddleware, async (req: AuthenticatedRequest, res: Response,
 router.get('/:id', authMiddleware, async (req: AuthenticatedRequest, res: Response, next) => {
   try {
     const uid = req.user!.uid;
-    const activity = await getActivityById(req.params.id);
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ error: 'Activity ID is required' });
+    }
+    const activity = await getActivityById(id);
     
     if (!activity) {
       return res.status(404).json({ error: 'Activity not found' });
@@ -62,6 +68,7 @@ router.get('/:id', authMiddleware, async (req: AuthenticatedRequest, res: Respon
     return res.json(activity);
   } catch (err) {
     next(err);
+    return;
   }
 });
 
@@ -69,10 +76,15 @@ router.get('/:id', authMiddleware, async (req: AuthenticatedRequest, res: Respon
 router.delete('/:id', authMiddleware, async (req: AuthenticatedRequest, res: Response, next) => {
   try {
     const uid = req.user!.uid;
-    await deleteActivity(req.params.id, uid);
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ error: 'Activity ID is required' });
+    }
+    await deleteActivity(id, uid);
     return res.json({ message: 'Activity successfully deleted' });
   } catch (err) {
     next(err);
+    return;
   }
 });
 

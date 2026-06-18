@@ -35,7 +35,7 @@ app.use(loggerMiddleware);
 app.use(rateLimiter);
 
 // Bind Routers
-app.get('/', (req: any, res: any) => {
+app.get('/', (_req: any, res: any) => {
   res.json({
     name: 'EcoTrace Carbon Intelligence API',
     version: '1.0.0',

@@ -1,5 +1,4 @@
 import { VertexAI } from '@google-cloud/vertexai';
-import { secrets } from './secrets';
 
 let vertexAIInstance: VertexAI | null = null;
 

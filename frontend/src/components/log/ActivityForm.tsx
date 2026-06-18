@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import React from 'react';
+import { useForm, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LogActivitySchema } from '../../lib/validators';
+import { LogActivitySchema, LogActivityInput } from '../../lib/validators';
 import { useActivities } from '../../hooks/useActivities';
 import { estimateEmissions } from '../../lib/emissions';
 import TransportFields from './TransportFields';
@@ -16,7 +16,7 @@ interface ActivityFormProps {
   onSuccess?: () => void;
 }
 
-const CATEGORY_DEFAULTS: Record<'transport' | 'food' | 'energy' | 'shopping', { subcategory: string; value: string; details: any }> = {
+const CATEGORY_DEFAULTS: Record<'transport' | 'food' | 'energy' | 'shopping', { subcategory: string; value: string; details: Record<string, unknown> }> = {
   transport: { subcategory: 'car', value: '', details: { vehicleType: 'petrol', passengers: 1, cabinClass: 'economy' } },
   food: { subcategory: 'vegetarian', value: '', details: {} },
   energy: { subcategory: 'electricity', value: '', details: { location: 'India' } },
@@ -39,12 +39,12 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
     setValue,
     reset,
     formState: { errors }
-  } = useForm({
-    resolver: zodResolver(LogActivitySchema),
+  } = useForm<LogActivityInput>({
+    resolver: zodResolver(LogActivitySchema) as unknown as Resolver<LogActivityInput>,
     defaultValues: {
       category: 'transport',
       subcategory: 'car',
-      value: '',
+      value: '' as unknown as number,
       details: {
         vehicleType: 'petrol',
         passengers: 1,
@@ -54,7 +54,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
     }
   });
 
-  const category = watch('category') as 'transport' | 'food' | 'energy' | 'shopping';
+  const category = watch('category');
   const subcategory = watch('subcategory');
   const value = watch('value');
   const details = watch('details');
@@ -64,7 +64,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
     setValue('category', newCategory);
     const defaults = CATEGORY_DEFAULTS[newCategory];
     setValue('subcategory', defaults.subcategory);
-    setValue('value', defaults.value as any);
+    setValue('value', defaults.value as unknown as number);
     setValue('details', defaults.details);
   };
 
@@ -72,7 +72,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
   const numValue = Number(value) || 0;
   const liveEmissions = estimateEmissions(category, subcategory, numValue, details);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LogActivityInput) => {
     try {
       // Map local date representation to valid ISO datetime
       const isoTimestamp = new Date(data.timestamp).toISOString();
@@ -84,7 +84,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
       reset({
         category: 'transport',
         subcategory: 'car',
-        value: '',
+        value: '' as unknown as number,
         details: {
           vehicleType: 'petrol',
           passengers: 1,
@@ -95,7 +95,7 @@ export const ActivityForm: React.FC<ActivityFormProps> = ({ onSuccess }) => {
       if (onSuccess) {
         onSuccess();
       }
-    } catch (err) {
+    } catch {
       // Handled in mutation hook
     }
   };

@@ -29,6 +29,7 @@ router.get('/csv', authMiddleware, async (req: AuthenticatedRequest, res: Respon
     }
   } catch (err) {
     next(err);
+    return;
   }
 });
 
@@ -69,8 +70,10 @@ router.get('/pdf', authMiddleware, async (req: AuthenticatedRequest, res: Respon
     });
 
     pdfDoc.end();
+    return;
   } catch (err) {
     next(err);
+    return;
   }
 });
 

@@ -39,6 +39,8 @@ export const LogActivitySchema = z.object({
   timestamp: z.string().min(1, 'Date is required'),
 });
 
+export type LogActivityInput = z.infer<typeof LogActivitySchema>;
+
 export const GoalCreateSchema = z.object({
   targetReductionPct: z.preprocess(
     (val) => Number(val),

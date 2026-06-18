@@ -1,7 +1,7 @@
 import { db } from '../config/firebase-admin';
 import { Activity } from '../models/Activity';
 import { UserProfile } from '../models/UserProfile';
-import { getStartOfDay, getStartOfWeek, getStartOfMonth, getDaysAgo, toISODateString } from '../utils/dateHelpers';
+import { getStartOfWeek, getStartOfMonth, getDaysAgo, toISODateString } from '../utils/dateHelpers';
 
 export interface DashboardData {
   stats: {
@@ -106,13 +106,15 @@ export async function getDashboardData(uid: string): Promise<DashboardData> {
     }
 
     // Category accumulation
-    if (categorySums[act.category] !== undefined) {
-      categorySums[act.category] += kg;
+    const currentSum = categorySums[act.category];
+    if (currentSum !== undefined) {
+      categorySums[act.category] = currentSum + kg;
     }
 
     // Trend accumulation
-    if (trendMap[actDateStr] !== undefined) {
-      trendMap[actDateStr] += kg;
+    const currentTrendSum = trendMap[actDateStr];
+    if (currentTrendSum !== undefined) {
+      trendMap[actDateStr] = currentTrendSum + kg;
     }
   });
 
@@ -126,11 +128,14 @@ export async function getDashboardData(uid: string): Promise<DashboardData> {
 
   // Format category chart array
   const totalEmissions = Object.values(categorySums).reduce((a, b) => a + b, 0);
-  const categories = Object.keys(categorySums).map(cat => ({
-    category: cat,
-    value: parseFloat(categorySums[cat].toFixed(2)),
-    percentage: totalEmissions > 0 ? parseFloat(((categorySums[cat] / totalEmissions) * 100).toFixed(1)) : 0
-  }));
+  const categories = Object.keys(categorySums).map(cat => {
+    const sum = categorySums[cat] || 0;
+    return {
+      category: cat,
+      value: parseFloat(sum.toFixed(2)),
+      percentage: totalEmissions > 0 ? parseFloat(((sum / totalEmissions) * 100).toFixed(1)) : 0
+    };
+  });
 
   // Format trend chart array with rolling average
   const sortedDates = Object.keys(trendMap).sort();
@@ -139,12 +144,16 @@ export async function getDashboardData(uid: string): Promise<DashboardData> {
     let sum = 0;
     let count = 0;
     for (let i = Math.max(0, idx - 6); i <= idx; i++) {
-      sum += trendMap[sortedDates[i]];
-      count++;
+      const d = sortedDates[i];
+      if (d !== undefined) {
+        sum += trendMap[d] || 0;
+        count++;
+      }
     }
+    const val = trendMap[date] || 0;
     return {
       date,
-      value: parseFloat(trendMap[date].toFixed(2)),
+      value: parseFloat(val.toFixed(2)),
       rollingAvg: parseFloat((sum / count).toFixed(2))
     };
   });
@@ -167,7 +176,7 @@ export async function getDashboardData(uid: string): Promise<DashboardData> {
   };
 }
 
-export async function getCommunityPercentile(uid: string, weeklyEmissions: number): Promise<number> {
+export async function getCommunityPercentile(_uid: string, weeklyEmissions: number): Promise<number> {
   try {
     const allUsersSnapshot = await db.collection('users').get();
     const allUsers = allUsersSnapshot.docs.map(doc => doc.data() as UserProfile);

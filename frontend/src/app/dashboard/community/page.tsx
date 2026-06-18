@@ -4,7 +4,7 @@ import React from 'react';
 import { useCommunity } from '../../../hooks/useCommunity';
 import { CommunityRankChart } from '../../../components/charts/CommunityRankChart';
 import { Card, CardBody, CardHeader } from '../../../components/ui/Card';
-import { Users, Shield, ArrowLeft, Info, Trophy, Loader2 } from 'lucide-react';
+import { Users, ArrowLeft, Trophy, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { formatCO2e } from '../../../lib/formatters';
 
@@ -122,7 +122,7 @@ export default function CommunityPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-850">
-              {leaderboard.map((entry: any) => (
+              {leaderboard.map((entry: { rank: number; displayName: string; isCurrentUser: boolean; weekly_kg_co2e: number }) => (
                 <tr
                   key={entry.rank}
                   className={`transition-colors ${

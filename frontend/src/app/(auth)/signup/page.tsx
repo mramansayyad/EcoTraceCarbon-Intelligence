@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import { auth, db } from '../../../lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { SignupSchema } from '../../../lib/validators';
-import { useAuthStore } from '../../../store/authStore';
+import { useAuthStore, UserProfileData } from '../../../store/authStore';
 import { useUIStore } from '../../../store/uiStore';
 import { Card, CardHeader, CardBody } from '../../../components/ui/Card';
 import { Input } from '../../../components/ui/Input';
@@ -17,6 +17,9 @@ import { Select } from '../../../components/ui/Select';
 import { Button } from '../../../components/ui/Button';
 import { Leaf, UserPlus, Info } from 'lucide-react';
 import { Tooltip } from '../../../components/ui/Tooltip';
+import { z } from 'zod';
+
+type SignupInput = z.infer<typeof SignupSchema>;
 
 export default function SignupPage() {
   const router = useRouter();
@@ -24,8 +27,8 @@ export default function SignupPage() {
   const { addToast } = useUIStore();
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    resolver: zodResolver(SignupSchema),
+  const { register, handleSubmit, formState: { errors } } = useForm<SignupInput>({
+    resolver: zodResolver(SignupSchema) as unknown as Resolver<SignupInput>,
     defaultValues: {
       displayName: '',
       email: '',
@@ -36,12 +39,12 @@ export default function SignupPage() {
     }
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: SignupInput) => {
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
       
-      const profile = {
+      const profile: UserProfileData = {
         uid: userCredential.user.uid,
         displayName: data.displayName,
         email: data.email,
@@ -50,23 +53,26 @@ export default function SignupPage() {
         weeklyTarget: data.weeklyTarget,
         baselineWeekly: data.weeklyTarget, // set initial baseline
         streakDays: 0,
-        lastActiveDate: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        lastActiveDate: null
       };
 
       // Create user profile document in Firestore
-      await setDoc(doc(db, 'users', userCredential.user.uid), profile);
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        ...profile,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
 
       setAuth(userCredential.user, profile);
       addToast('Welcome to EcoTrace! Let\'s track your carbon footprint.', 'success');
       router.push('/dashboard');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Firebase Auth Signup Error:', err);
       let friendlyMessage = 'Registration failed. Please try again.';
       
-      const errorCode = err.code || '';
-      const errorMessage = err.message || '';
+      const error = err as { code?: string; message?: string };
+      const errorCode = error.code || '';
+      const errorMessage = error.message || '';
       
       if (errorCode === 'auth/email-already-in-use' || errorMessage.includes('auth/email-already-in-use')) {
         friendlyMessage = 'An account with this email already exists. Please sign in instead.';

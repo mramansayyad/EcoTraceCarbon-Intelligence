@@ -55,7 +55,12 @@ export const CommunityRankChart: React.FC<CommunityRankChartProps> = ({ data }) 
               borderRadius: '8px'
             }}
             itemStyle={{ fontSize: '12px' }}
-            formatter={(val: any) => [`${Number(val).toFixed(1)} kg CO2e/week`]}
+            formatter={(val: string | number | readonly (string | number)[] | undefined) => {
+              if (typeof val === 'number' || typeof val === 'string') {
+                return [`${Number(val).toFixed(1)} kg CO2e/week`];
+              }
+              return ['0.0 kg CO2e/week'];
+            }}
           />
           <Bar dataKey="Emissions" radius={[0, 4, 4, 0]}>
             {chartData.map((entry, index) => (

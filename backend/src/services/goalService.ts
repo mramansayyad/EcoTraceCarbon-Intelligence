@@ -132,8 +132,8 @@ export async function getGoalProgress(goalId: string, uid: string): Promise<Goal
 
     progress.push({
       weekIndex: i + 1,
-      startDate: weekStart.toISOString().split('T')[0],
-      endDate: weekEnd.toISOString().split('T')[0],
+      startDate: weekStart.toISOString().split('T')[0] || '',
+      endDate: weekEnd.toISOString().split('T')[0] || '',
       target: goal.targetWeekly,
       actual: parseFloat(actualEmissions.toFixed(2))
     });

@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import api from '../lib/api';
 import { useUIStore } from '../store/uiStore';
 
@@ -23,7 +24,7 @@ export function useGoals() {
       queryClient.invalidateQueries({ queryKey: ['goals'] });
       addToast('Reduction goal created successfully!', 'success');
     },
-    onError: (err: any) => {
+    onError: (err: AxiosError<{ error?: string }>) => {
       const errMsg = err.response?.data?.error || 'Failed to create goal';
       addToast(errMsg, 'error');
     }
@@ -42,7 +43,7 @@ export function useGoals() {
   };
 
   return {
-    goals: goalsQuery.data || [],
+    goals: (goalsQuery.data as unknown[]) || [],
     isLoading: goalsQuery.isLoading,
     error: goalsQuery.error,
     createGoal: createGoalMutation.mutateAsync,

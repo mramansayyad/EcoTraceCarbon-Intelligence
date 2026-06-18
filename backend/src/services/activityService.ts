@@ -2,7 +2,7 @@ import { db } from '../config/firebase-admin';
 import { Activity, ActivitySchema } from '../models/Activity';
 import { calculateActivityEmissions, ValidationError } from './emissionService';
 import { publishToTopic } from '../utils/pubsub';
-import { getStartOfDay, toISODateString } from '../utils/dateHelpers';
+import { toISODateString } from '../utils/dateHelpers';
 
 export async function createActivity(uid: string, activityData: Omit<Activity, 'uid' | 'kg_co2e' | 'createdAt'>): Promise<Activity> {
   // Validate schema
@@ -164,10 +164,8 @@ export async function updateStreakAndActivityDate(uid: string, activityTimestamp
   const todayStr = toISODateString(checkDate);
   const todayEmissions = dailyEmissions[todayStr] || 0;
 
-  let startFromYesterday = false;
   if (todayEmissions === 0) {
     // No logs today, check starting from yesterday to maintain streak
-    startFromYesterday = true;
     checkDate.setDate(checkDate.getDate() - 1);
   }
 

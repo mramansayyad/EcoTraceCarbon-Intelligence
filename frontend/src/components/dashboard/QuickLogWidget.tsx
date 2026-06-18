@@ -3,6 +3,7 @@
 import React from 'react';
 import { Card, CardBody, CardHeader } from '../ui/Card';
 import { useActivities } from '../../hooks/useActivities';
+import { LogActivityInput } from '../../lib/validators';
 import { 
   Train, 
   Utensils, 
@@ -16,7 +17,7 @@ import { Button } from '../ui/Button';
 export const QuickLogWidget: React.FC = () => {
   const { logActivity, isLogging } = useActivities();
 
-  const quickItems = [
+  const quickItems: Array<{ label: string; icon: React.ReactNode; payload: LogActivityInput }> = [
     {
       label: 'Train commute (15km)',
       icon: <Train className="h-4 w-4" />,
@@ -85,10 +86,10 @@ export const QuickLogWidget: React.FC = () => {
     }
   ];
 
-  const handleQuickLog = async (payload: any) => {
+  const handleQuickLog = async (payload: LogActivityInput) => {
     try {
       await logActivity(payload);
-    } catch (e) {
+    } catch {
       // Handled inside hook
     }
   };

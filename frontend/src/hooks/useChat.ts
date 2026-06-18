@@ -90,7 +90,7 @@ export function useChat() {
                   return updated;
                 });
               }
-            } catch (e) {
+            } catch {
               // Ignore incomplete JSON chunks
             }
           }

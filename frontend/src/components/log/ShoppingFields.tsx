@@ -1,12 +1,13 @@
 import React from 'react';
 import { UseFormRegister, FieldErrors, UseFormWatch } from 'react-hook-form';
+import { LogActivityInput } from '../../lib/validators';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 
 interface ShoppingFieldsProps {
-  register: UseFormRegister<any>;
-  errors: FieldErrors<any>;
-  watch: UseFormWatch<any>;
+  register: UseFormRegister<LogActivityInput>;
+  errors: FieldErrors<LogActivityInput>;
+  watch: UseFormWatch<LogActivityInput>;
 }
 
 export const ShoppingFields: React.FC<ShoppingFieldsProps> = ({ register, errors, watch }) => {

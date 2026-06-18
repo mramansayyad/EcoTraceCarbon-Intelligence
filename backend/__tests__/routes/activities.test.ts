@@ -1,7 +1,6 @@
 import request from 'supertest';
 console.log('EXPRESS TYPE AT TOP OF TEST:', typeof require('express'), require('express'));
 import { app } from '../../src/app.js';
-import { db } from '../../src/config/firebase-admin';
 
 // Mock Firebase Admin
 const mockAdd = jest.fn();

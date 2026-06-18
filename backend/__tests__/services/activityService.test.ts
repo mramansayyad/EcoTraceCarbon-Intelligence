@@ -1,5 +1,4 @@
-import { createActivity, getActivities, deleteActivity } from '../../src/services/activityService';
-import { db } from '../../src/config/firebase-admin';
+import { createActivity } from '../../src/services/activityService';
 
 // Mock Firebase Admin
 const mockAdd = jest.fn();

@@ -20,6 +20,9 @@ export async function authMiddleware(
   }
 
   const token = authHeader.split('Bearer ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized: Missing or invalid authorization header' });
+  }
 
   try {
     let decodedToken;
@@ -42,6 +45,7 @@ export async function authMiddleware(
     }
 
     next();
+    return;
   } catch (err: any) {
     console.error('Firebase token verification failed:', err);
     return res.status(401).json({ error: 'Unauthorized: Expired or invalid token' });

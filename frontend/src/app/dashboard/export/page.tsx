@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import api from '../../../lib/api';
 import { useUIStore } from '../../../store/uiStore';
-import { Card, CardBody } from '../../../components/ui/Card';
+import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
-import { Download, FileSpreadsheet, FileText, ArrowLeft, Info, HelpCircle } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, ArrowLeft, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function ExportPage() {
@@ -27,7 +27,7 @@ export default function ExportPage() {
         // Fallback to streaming download
         await downloadStream(type);
       }
-    } catch (err: any) {
+    } catch {
       // 2. If JSON fetch fails/streams binary directly, try streaming download
       try {
         await downloadStream(type);

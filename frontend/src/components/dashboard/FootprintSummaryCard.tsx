@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardBody } from '../ui/Card';
-import { ArrowUpRight, ArrowDownRight, Award, Zap, TrendingUp, HelpCircle } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Award, TrendingUp } from 'lucide-react';
 import { formatCO2e } from '../../lib/formatters';
 
 interface FootprintSummaryCardProps {
